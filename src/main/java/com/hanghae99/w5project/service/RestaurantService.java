@@ -19,11 +19,12 @@ public class RestaurantService {
         this.restaurantRepository = restaurantRepository;
     }
 
-
+    // 음식점 조회
     public List<Restaurant> showRestaurant() {
         return restaurantRepository.findAll();
     }
 
+    // 음식점 등록
     public Restaurant saveRestaurant(@RequestBody RestaurantRequestDto requestDto) {
         String name = requestDto.getName();
         Long minOrderPrice = requestDto.getMinOrderPrice();
