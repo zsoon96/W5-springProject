@@ -13,4 +13,5 @@ public class FoodRequestDto {
     private final Long restaurantId;
     private final String name;
     private final Long price;
+
 }
