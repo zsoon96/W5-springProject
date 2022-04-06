@@ -49,9 +49,9 @@ public class OrderService {
             Food food = foodRepository.findById(requestDto.getFoods().get(i).getId()).orElseThrow(
                     () -> new NullPointerException("해당 음식이 존재하지 않습니다.")
             );
-            String name = food.getName();
-
             int quantity = requestDto.getFoods().get(i).getQuantity();
+
+            String name = food.getName();
             Long price = food.getPrice() * quantity;
 
             if (quantity < 1 || quantity > 100) {

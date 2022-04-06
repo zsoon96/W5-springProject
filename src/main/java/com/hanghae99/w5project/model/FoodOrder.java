@@ -1,6 +1,5 @@
 package com.hanghae99.w5project.model;
 
-import com.hanghae99.w5project.dto.FoodRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

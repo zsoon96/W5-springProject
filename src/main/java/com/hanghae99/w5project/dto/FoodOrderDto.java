@@ -3,8 +3,6 @@ package com.hanghae99.w5project.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.xml.bind.annotation.XmlSeeAlso;
-
 @Getter
 @Setter
 public class FoodOrderDto {

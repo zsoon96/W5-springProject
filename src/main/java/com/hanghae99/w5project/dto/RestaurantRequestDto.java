@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 public class RestaurantRequestDto {
-    private final String name;
-    private final Long minOrderPrice;
-    private final Long deliveryFee;
+    private String name;
+    private Long minOrderPrice;
+    private Long deliveryFee;
 }

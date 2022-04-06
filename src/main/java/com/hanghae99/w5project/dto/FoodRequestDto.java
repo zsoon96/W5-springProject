@@ -10,8 +10,8 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class FoodRequestDto {
 
-    private final Long restaurantId;
-    private final String name;
-    private final Long price;
+    private Long restaurantId;
+    private String name;
+    private Long price;
 
 }
