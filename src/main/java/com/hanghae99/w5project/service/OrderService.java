@@ -1,6 +1,7 @@
 package com.hanghae99.w5project.service;
 
 import com.hanghae99.w5project.dto.FoodOrderDto;
+import com.hanghae99.w5project.dto.FoodOrderRequestDto;
 import com.hanghae99.w5project.dto.OrderDto;
 import com.hanghae99.w5project.dto.OrderRequestDto;
 import com.hanghae99.w5project.model.Food;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -29,13 +31,17 @@ public class OrderService {
     // 주문 등록하기
     public OrderDto saveOrder(OrderRequestDto requestDto) {
 
-        // OrderRequestDto > restaurantId를 통해 restaurantName, deliveryFee 값 불러오기
+        // OrderRequestDto > restaurantId으로 레스토랑 정보 불러오기
+        // 예외처리 방법-1
         Restaurant restaurant = restaurantRepository.findById(requestDto.getRestaurantId()).orElseThrow(
                 () -> new NullPointerException("해당 음식점이 존재하지 않습니다.")
         );
+        // 레스토랑 정보 변수 초기화 선언
         String restaurantName = restaurant.getName();
         Long deliveryFee = restaurant.getDeliveryFee();
         int totalPrice = 0;
+
+
 
         // OrderDto와 Orders에 들어갈 FoodOrderDto 리스트가 필요하기 때문에 각각 생성
         // 리턴할 타입의 리스트 생성
@@ -43,22 +49,33 @@ public class OrderService {
         // 디비에 저장할 리스트 생성
         List<FoodOrder> foodOrder = new ArrayList<>();
 
-        // OrderRequestDto > FoodOrderRequestDto의 id값을 통해 name, price 그리고 quantity 값 불러오기
-        for (int i=0; i < requestDto.getFoods().size(); i++) {
-            // 조건문을 돌릴 변수들 선언
-            Food food = foodRepository.findById(requestDto.getFoods().get(i).getId()).orElseThrow(
-                    () -> new NullPointerException("해당 음식이 존재하지 않습니다.")
-            );
-            int quantity = requestDto.getFoods().get(i).getQuantity();
+        // OrderRequestDto > List<FoodOrderRequestDto> 값으로 음식 정보 불러오기
+        // for each문
+        for (FoodOrderRequestDto foodOrderRequestDto : requestDto.getFoods()) {
+            // Food Id, quantity 불러오기
+            Long foodId = foodOrderRequestDto.getId();
+            int quantity = foodOrderRequestDto.getQuantity();
+            // 주문 수량 검증 메소드
+            foodQuantityCheck(quantity);
 
-            String name = food.getName();
-            Long price = food.getPrice() * quantity;
+            // Food Id로 음식 정보 불러오기
+            // 예외처리 방법-2
+            Optional<Food> food = foodRepository.findById(foodOrderRequestDto.getId());
+            // 음식 정보 변수 초기화
+            String name = "";
+            Long price = 0L;
 
-            if (quantity < 1 || quantity > 100) {
-                throw new IllegalArgumentException("수량을 확인해주세요.");
+            // 음식 정보 예외 처리
+            if (food.isPresent()) {
+                name = food.get().getName();
+                price = food.get().getPrice();
             }
 
+            // 총 금액 구하기
+            price = price * quantity;
             totalPrice += price;
+
+
 
             // FoodOrder 리스트에 값 넣어주기 -> 테이블에 저장
             FoodOrder foodOrder1 = new FoodOrder(name, price, quantity);
@@ -70,10 +87,10 @@ public class OrderService {
             foodOrderDto.add(foodOrderDto1);
         }
 
-        if (restaurant.getMinOrderPrice() > totalPrice) {
-            throw new IllegalArgumentException("최소 주문가격을 맞춰주세요.");
-        }
+        // 최소 주문금액 검증 메소드
+        minOrderPriceCheck(totalPrice, restaurant);
 
+        // 최종 결제 금액 계산
         totalPrice += deliveryFee;
 
 
@@ -84,6 +101,20 @@ public class OrderService {
         orderRepository.save(orders);
 
         return orderList;
+    }
+
+    // 주문 수량 검증 메소드
+    public void foodQuantityCheck(int quantity) {
+        if (quantity < 1 || quantity > 100) {
+            throw new IllegalArgumentException("수량을 확인해주세요.");
+        }
+    }
+
+    // 최소 주문금액 검증 메소드
+    public void minOrderPriceCheck(int totalPrice, Restaurant restaurant) {
+        if (restaurant.getMinOrderPrice() > totalPrice) {
+            throw new IllegalArgumentException("최소 주문가격을 맞춰주세요.");
+        }
     }
 
     // 주문 조회하기

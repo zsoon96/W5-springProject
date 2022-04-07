@@ -1,9 +1,7 @@
 package com.hanghae99.w5project.controller;
 
-import com.hanghae99.w5project.dto.FoodOrderRequestDto;
 import com.hanghae99.w5project.dto.OrderDto;
 import com.hanghae99.w5project.dto.OrderRequestDto;
-import com.hanghae99.w5project.model.Food;
 import com.hanghae99.w5project.model.Orders;
 import com.hanghae99.w5project.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +17,7 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+//    private final OrderService2 orderService2;
 
     // 주문 요청
     @PostMapping("/order/request")
